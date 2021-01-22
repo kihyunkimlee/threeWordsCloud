@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { Sequelize, DataTypes } = require('sequelize');
+const { Sequelize, DataTypes, Op } = require('sequelize');
 
 const { DB_HOST, DB_PORT, DB_USER, DB_PW, DB_NAME } = process.env;
 
@@ -36,4 +36,5 @@ for(let modelName in models){
 module.exports = {
     sequelize,
     models,
+    Op
 };
