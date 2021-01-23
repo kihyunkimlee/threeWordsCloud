@@ -3,19 +3,38 @@ const should = require('should');
 const fs = require('fs');
 const path = require('path');
 const app = require('../../');
-const { sequelize } = require('../../models/');
+const { sequelize, models } = require('../../models/');
 
 describe('POST /upload/file은', () => {
-    before(() => sequelize.sync());
+    const words = [
+        {word: '알고리즘'},
+        {word: '자료구조'},
+        {word: '운영체제'},
+        {word: '네트워크'},
+        {word: '컴퓨터구조'}
+    ];
+
+    before(() => sequelize.sync({force: true}));
+    before(() => models.Word.bulkCreate(words));
 
     describe('성공시', () => {
-        it('세 개의 키값을 반환한다', (done) => {
+        it('파일 객체를 반환한다', (done) => {
             request(app)
                 .post('/upload/file')
                 .set('Content-Type', 'multipart/form-data')
                 .attach('file', path.join(__dirname, '/test.jpg'))
+                .expect(201)
                 .end((err, res) => {
-                    res.body.should.have.properties('word1', 'word2', 'word3');
+                    res.body.should.have.properties([
+                        'word1',
+                        'word2',
+                        'word3',
+                        'originalFileName',
+                        'fileSize',
+                        'fileMimeType',
+                        'fileUploadedPath',
+                        'createdAt'
+                    ]);
                     done();
                 });
         });

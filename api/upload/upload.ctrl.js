@@ -39,7 +39,6 @@ const createthreeWordsKey = async () => {
 };
 
 const uploadFile = async (req, res, next) => {
-    console.log(req);
     if (!req.file){
         if (req.fileFormatError){
             return res.status(415).end();
@@ -67,11 +66,9 @@ const uploadFile = async (req, res, next) => {
         fileMimeType: mimetype,
         fileUploadedPath: path,
     }).then((file) => {
-        return res.json({
-            word1: file.word1,
-            word2: file.word2,
-            word3: file.word3,
-        });
+        return res.status(201).json(
+            file
+        );
     }).catch(next);
     
 };
