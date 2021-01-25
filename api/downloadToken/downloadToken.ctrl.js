@@ -1,15 +1,11 @@
 const { models, Op } = require('../../models/');
 
-const downloadFile = (req, res, next) => {
-    const threeWordsKey = req.body.threeWordsKey;
+const getDownloadToken = (req, res, next) => {
+    const { word1, word2, word3 } = req.body;
 
-    if (!threeWordsKey){
-        res.status(400).end();
-    } else if (!threeWordsKey.word1 || !threeWordsKey.word2 || !threeWordsKey.word3){
+    if (!word1 || !word2 || !word3){
         res.status(400).end();
     }
-
-    const { word1, word2, word3 } = threeWordsKey; 
 
     models.File.findOne({
         where: {
@@ -22,12 +18,14 @@ const downloadFile = (req, res, next) => {
     }).then((file) => {
         if (!file) return res.status(404).end();
 
-        req.session.originalFileName = file.originalFileName;
+        req.session.word1 = word1;
+        req.session.word2 = word2;
+        req.session.word3 = word3;
 
         return res.json(file);
     }).catch(next);
 };
 
 module.exports = {
-    downloadFile,
+    getDownloadToken,
 };

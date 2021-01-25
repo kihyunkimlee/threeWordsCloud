@@ -5,7 +5,7 @@ const morgan = require('morgan');
 const session = require('express-session');
 const MySqlStore = require('express-mysql-session')(session);
 const upload = require('./api/upload/');
-const download = require('./api/download/');
+const downloadToken = require('./api/downloadToken');
 
 if (process.env.NODE_ENV == 'test'){
     app.use(morgan('dev'));
@@ -37,6 +37,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/upload/file', upload);
-app.use('/download/file', download);
+app.use('/downloadToken', downloadToken);
 
 module.exports = app;
