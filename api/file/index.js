@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const ctrl = require('./upload.ctrl');
+const ctrl = require('./file.ctrl');
 const multer = require('multer');
 const { createPath, makeDir } = require('../../lib');
 const { handleMulterError, handleDBError } = require('../../middleware/errorHandler');
@@ -35,7 +35,7 @@ const upload = multer({
     limits: { fileSize: 3*1024*1024 },
 });
 
-router.post('', upload.single('file'), ctrl.uploadFile);
+router.post('', upload.single('file'), ctrl.postFile);
 
 router.use(handleDBError);
 router.use(handleMulterError);

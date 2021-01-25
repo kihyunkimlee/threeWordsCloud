@@ -5,7 +5,7 @@ const path = require('path');
 const app = require('../../');
 const { sequelize, models } = require('../../models/');
 
-describe('POST /upload/file은', () => {
+describe('POST /file은', () => {
     const words = [
         {word: '알고리즘'},
         {word: '자료구조'},
@@ -20,7 +20,7 @@ describe('POST /upload/file은', () => {
     describe('성공시', () => {
         it('파일 객체를 반환한다', (done) => {
             request(app)
-                .post('/upload/file')
+                .post('/file')
                 .set('Content-Type', 'multipart/form-data')
                 .attach('file', path.join(__dirname, '/test.jpg'))
                 .expect(201)
@@ -43,7 +43,7 @@ describe('POST /upload/file은', () => {
     describe('실패시', () => {
         it('파일을 업로드하지 않으면 400을 응답한다', (done) => {
             request(app)
-                .post('/upload/file')
+                .post('/file')
                 .set('Content-Type', 'multipart/form-data boundary=---&')
                 .attach('file', '')
                 .expect(400)
@@ -52,7 +52,7 @@ describe('POST /upload/file은', () => {
 
         it('업로드가 금지된 형식의 파일을 업로드하면 415을 응답한다', (done) => {
             request(app)
-                .post('/upload/file')
+                .post('/file')
                 .set('Content-Type', 'multipart/form-data')
                 .attach('file', path.join(__dirname, '/test.php'))
                 .expect(415)
@@ -61,7 +61,7 @@ describe('POST /upload/file은', () => {
 
         it('업로드한 파일의 사이즈가 3MB를 초과하면 400을 응답한다', (done) => {
             request(app)
-                .post('/upload/file')
+                .post('/file')
                 .set('Content-Type', 'multipart/form-data')
                 .attach('file', path.join(__dirname, '/bigPicture.jpg'))
                 .expect(400, {

@@ -38,7 +38,7 @@ const createthreeWordsKey = async () => {
     return [-1, -1, -1];
 };
 
-const uploadFile = async (req, res, next) => {
+const postFile = async (req, res, next) => {
     if (!req.file){
         if (req.fileFormatError){
             return res.status(415).end();
@@ -74,5 +74,5 @@ const uploadFile = async (req, res, next) => {
 };
 
 module.exports = {
-    uploadFile,
+    postFile,
 };

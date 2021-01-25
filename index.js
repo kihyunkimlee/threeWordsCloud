@@ -4,7 +4,7 @@ const app = express();
 const morgan = require('morgan');
 const session = require('express-session');
 const MySqlStore = require('express-mysql-session')(session);
-const upload = require('./api/upload/');
+const file = require('./api/file/');
 const downloadToken = require('./api/downloadToken');
 
 if (process.env.NODE_ENV == 'test'){
@@ -36,7 +36,7 @@ app.use(session({
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use('/upload/file', upload);
+app.use('/file', file);
 app.use('/downloadToken', downloadToken);
 
 module.exports = app;
