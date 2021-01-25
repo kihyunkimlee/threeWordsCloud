@@ -4,7 +4,7 @@ const getDownloadToken = (req, res, next) => {
     const { word1, word2, word3 } = req.body;
 
     if (!word1 || !word2 || !word3){
-        res.status(400).end();
+        return res.status(400).end();
     }
 
     models.File.findOne({

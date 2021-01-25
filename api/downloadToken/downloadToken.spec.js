@@ -21,7 +21,7 @@ describe('POST /downloadToken은 ', () => {
 
     before((done) => {
         request(app)
-            .post('/upload/file')
+            .post('/file')
             .set('Content-Type', 'multipart/form-data')
             .attach('file', path.join(__dirname, '/', originalFileName))
             .end((err, res) => {
