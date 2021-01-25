@@ -36,6 +36,7 @@ const upload = multer({
 });
 
 router.post('', upload.single('file'), ctrl.postFile);
+router.get('/:year/:month/:date/:fileName', ctrl.getFile);
 
 router.use(handleDBError);
 router.use(handleMulterError);

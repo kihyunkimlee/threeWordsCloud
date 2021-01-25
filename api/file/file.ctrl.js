@@ -1,4 +1,5 @@
 const { sequelize, models, Op } = require('../../models/');
+const fs = require('fs');
 
 const createthreeWordsKey = async () => {
     const { count, rows } = await models.Word.findAndCountAll({
@@ -73,6 +74,40 @@ const postFile = async (req, res, next) => {
     
 };
 
+const getFile = (req, res, next) => {
+    if (!req.session.word1){
+        return res.status(400).end();
+    }
+
+    const { year, month, date, fileName } = req.params;
+
+    const fileUploadedPath = 'file/' + year + '/' + month + '/' + date + '/' + fileName;
+
+    const { word1, word2, word3 } = req.session;
+
+    models.File.findOne({
+        where: {
+            [Op.and] : [
+                {word1: word1},
+                {word2: word2},
+                {word3: word3},
+            ]
+        }
+    }).then((file) => {
+        if (file.fileUploadedPath !== fileUploadedPath){
+            return res.status(400).end();
+        }
+
+        res.setHeader('Content-disposition', 'filename=' + file.originalFileName);
+        res.setHeader('Content-type', file.fileMimeType);
+
+        const filestream = fs.createReadStream(file.fileUploadedPath);
+        filestream.pipe(res);
+    }).catch(next);
+
+};
+
 module.exports = {
     postFile,
+    getFile,
 };

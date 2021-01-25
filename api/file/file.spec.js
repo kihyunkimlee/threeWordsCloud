@@ -71,3 +71,79 @@ describe('POST /file은', () => {
         });
     });
 });
+
+describe('GET /file은', () => {
+    const words = [
+        {word: '알고리즘'},
+        {word: '자료구조'},
+        {word: '운영체제'},
+        {word: '네트워크'},
+        {word: '컴퓨터구조'}
+    ];
+
+    before(() => sequelize.sync({force: true}));
+    before(() => models.Word.bulkCreate(words));
+
+    const originalFileName = 'test.jpg';
+    let threeWordsKey = {};
+
+    before((done) => {
+        request(app)
+            .post('/file')
+            .set('Content-Type', 'multipart/form-data')
+            .attach('file', path.join(__dirname, '/', originalFileName))
+            .end((err, res) => {
+                threeWordsKey.word1 = res.body.word1;
+                threeWordsKey.word2 = res.body.word2;
+                threeWordsKey.word3 = res.body.word3;
+
+                done();
+            });
+    });
+
+    let fileUploadedPath;
+    let cookie;
+
+    before((done) => {
+        request(app)
+            .post('/downloadToken')
+            .send(threeWordsKey)
+            .end((err, res) => {
+                cookie = res.header['set-cookie'][0].split(';')[0];
+                fileUploadedPath = res.body.fileUploadedPath;
+
+                done();
+            });
+    });
+
+    describe('성공시', () => {
+        it('원래 파일 이름이 ' + originalFileName + ' 인 파일을 반환한다.', (done) => {
+            request(app)
+                .get('/' + fileUploadedPath)
+                .set('cookie', cookie)
+                .end((err, res) => {
+                    res.header.should.have.properties({
+                        'content-disposition': 'filename=' + originalFileName,
+                    });
+                    done();
+                });
+        });
+    });
+
+    describe('실패시', () => {
+        it('요청 헤더에 세션키가 설정되어 있지 않은 경우 400을 응답한다.', (done) =>{
+            request(app)
+                .get('/' + fileUploadedPath)
+                .expect(400)
+                .end(done);
+        });
+
+        it('다운로드할 수 있도록 허가 받은 파일 이외에 다른 파일을 요청한 경우 400을 응답한다.', (done) => {
+            const d = new Date();
+            request(app)
+                .get('/file/2020/01/25/NOT_ALLOWED_FILE_NAME')
+                .expect(400)
+                .end(done);
+        });
+    });
+});
