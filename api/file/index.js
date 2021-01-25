@@ -7,7 +7,7 @@ const { handleMulterError, handleDBError } = require('../../middleware/errorHand
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        const newPath = createPath('uploads');
+        const newPath = createPath('file');
 
         makeDir(newPath);
 
