@@ -6,3 +6,9 @@ file/
 
 #list of keys
 lib/words.js
+
+#.DS_Store
+.DS_Store
+
+#environment variables
+.env

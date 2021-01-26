@@ -1,6 +1,9 @@
+const dotenv = require('dotenv');
 const fs = require('fs');
 const path = require('path');
 const { Sequelize, DataTypes, Op } = require('sequelize');
+
+dotenv.config();
 
 const { DB_HOST, DB_PORT, DB_USER, DB_PW, DB_NAME } = process.env;
 

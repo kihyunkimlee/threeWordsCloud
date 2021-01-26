@@ -2,16 +2,19 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const app = express();
 const morgan = require('morgan');
+const dotenv = require('dotenv');
 const session = require('express-session');
 const MySqlStore = require('express-mysql-session')(session);
 const file = require('./api/file/');
 const downloadToken = require('./api/downloadToken');
 
-if (process.env.NODE_ENV == 'test'){
+if (process.env.NODE_ENV !== 'test'){
     app.use(morgan('dev'));
 }
 
-const { DB_HOST, DB_PORT, DB_USER, DB_PW, DB_NAME } = process.env;
+dotenv.config();
+
+const { DB_HOST, DB_PORT, DB_USER, DB_PW, SESSION_DB_NAME } = process.env;
 
 const sessionStore = new MySqlStore({
     dialect: 'mysql',
@@ -19,7 +22,7 @@ const sessionStore = new MySqlStore({
     port: DB_PORT,
     user: DB_USER,
     password: DB_PW,
-    database: DB_NAME,
+    database: SESSION_DB_NAME,
 });
 
 app.use(session({
