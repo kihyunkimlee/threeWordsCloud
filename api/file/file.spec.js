@@ -131,18 +131,18 @@ describe('GET /file은', () => {
     });
 
     describe('실패시', () => {
-        it('요청 헤더에 세션키가 설정되어 있지 않은 경우 400을 응답한다.', (done) =>{
+        it('요청 헤더에 세션키가 설정되어 있지 않은 경우 401을 응답한다.', (done) =>{
             request(app)
                 .get('/' + fileUploadedPath)
-                .expect(400)
+                .expect(401)
                 .end(done);
         });
 
-        it('다운로드할 수 있도록 허가 받은 파일 이외에 다른 파일을 요청한 경우 400을 응답한다.', (done) => {
-            const d = new Date();
+        it('다운로드할 수 있도록 허가 받은 파일 이외에 다른 파일을 요청한 경우 403을 응답한다.', (done) => {
             request(app)
                 .get('/file/2020/01/25/NOT_ALLOWED_FILE_NAME')
-                .expect(400)
+                .set('cookie', cookie)
+                .expect(403)
                 .end(done);
         });
     });

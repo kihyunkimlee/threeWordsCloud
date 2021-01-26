@@ -57,7 +57,7 @@ const postFile = async (req, res, next) => {
     }
 
     const { originalname, size, mimetype, path } = req.file;
-    
+
     models.File.create({
         word1: threeWordsKey[0],
         word2: threeWordsKey[1],
@@ -67,23 +67,20 @@ const postFile = async (req, res, next) => {
         fileMimeType: mimetype,
         fileUploadedPath: path,
     }).then((file) => {
-        return res.status(201).json(
-            file
-        );
+        return res.status(201).json(file);
     }).catch(next);
-    
+
 };
 
 const getFile = (req, res, next) => {
-    if (!req.session.word1){
-        return res.status(400).end();
+    const { word1, word2, word3 } = req.session;
+    if (!word1 || !word2 || !word3){
+        return res.status(401).end();
     }
 
     const { year, month, date, fileName } = req.params;
 
     const fileUploadedPath = 'file/' + year + '/' + month + '/' + date + '/' + fileName;
-
-    const { word1, word2, word3 } = req.session;
 
     models.File.findOne({
         where: {
@@ -95,7 +92,7 @@ const getFile = (req, res, next) => {
         }
     }).then((file) => {
         if (file.fileUploadedPath !== fileUploadedPath){
-            return res.status(400).end();
+            return res.status(403).end();
         }
 
         res.setHeader('Content-disposition', 'filename=' + file.originalFileName);
