@@ -109,6 +109,8 @@ const getFile = (req, res, next) => {
             ]
         }
     }).then((file) => {
+        if (!file) return res.status(410).end();
+        
         if (file.fileUploadedPath !== fileUploadedPath){
             return res.status(403).end();
         }
