@@ -23,6 +23,7 @@ describe('POST /file은', () => {
                 .post('/file')
                 .set('Content-Type', 'multipart/form-data')
                 .attach('file', path.join(__dirname, '/test.jpg'))
+                .attach('age', 43200000)
                 .expect(201)
                 .end((err, res) => {
                     res.body.should.have.properties([
@@ -33,7 +34,8 @@ describe('POST /file은', () => {
                         'fileSize',
                         'fileMimeType',
                         'fileUploadedPath',
-                        'createdAt'
+                        'createdAt',
+                        'expiredAt',
                     ]);
                     done();
                 });
@@ -46,6 +48,16 @@ describe('POST /file은', () => {
                 .post('/file')
                 .set('Content-Type', 'multipart/form-data boundary=---&')
                 .attach('file', '')
+                .expect(400)
+                .end(done);
+        });
+
+        it('age 파라미터의 값이 허용되지 않은 값인 경우 400을 응답한다.', (done) => {
+            request(app)
+                .post('/file')
+                .set('Content-Type', 'multipart/form-data')
+                .attach('file', path.join(__dirname, '/test.jpg'))
+                .attach('age', 999999999)
                 .expect(400)
                 .end(done);
         });

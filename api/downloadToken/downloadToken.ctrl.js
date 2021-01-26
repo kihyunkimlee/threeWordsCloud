@@ -18,6 +18,8 @@ const getDownloadToken = (req, res, next) => {
     }).then((file) => {
         if (!file) return res.status(404).end();
 
+        if (file.expiredAt - Date.now() <= 0) return res.status(410).end();
+        
         req.session.word1 = word1;
         req.session.word2 = word2;
         req.session.word3 = word3;

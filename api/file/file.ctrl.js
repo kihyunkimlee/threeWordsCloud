@@ -40,6 +40,20 @@ const createthreeWordsKey = async () => {
 };
 
 const postFile = async (req, res, next) => {
+    const listOfMaxAges = [
+        30000,    //30 seconds for test
+        10800000, //3 hours
+        43200000, //12 hours
+        86400000, //24 hours
+    ];
+
+    let age = parseInt(req.body.age, 10);
+    if (Number.isNaN(age)){
+        age = 10800000;
+    } else if (listOfMaxAges.every((maxAge) => (age !== maxAge))){
+        return res.status(400).end();
+    }
+
     if (!req.file){
         if (req.fileFormatError){
             return res.status(415).end();
@@ -58,6 +72,8 @@ const postFile = async (req, res, next) => {
 
     const { originalname, size, mimetype, path } = req.file;
 
+    const now = Date.now();
+
     models.File.create({
         word1: threeWordsKey[0],
         word2: threeWordsKey[1],
@@ -66,6 +82,8 @@ const postFile = async (req, res, next) => {
         fileSize: size,
         fileMimeType: mimetype,
         fileUploadedPath: path,
+        createdAt: now,
+        expiredAt: now + age,
     }).then((file) => {
         return res.status(201).json(file);
     }).catch(next);

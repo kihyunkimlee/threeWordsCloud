@@ -39,11 +39,17 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.TEXT,
             allowNull: false,
         },
+        createdAt: {
+            type: DataTypes.DATE,
+            allowNull: false, 
+        },
+        expiredAt: {
+            type: DataTypes.DATE,
+            allowNull: false,
+        }
     },
     {
-        timestamps: true,
-        createdAt: true,
-        updatedAt: false,
+        timestamps: false,
     });
 
     file.associate = function (models) {
