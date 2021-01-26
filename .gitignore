@@ -3,3 +3,6 @@ node_modules/
 
 # uploaded files
 file/
+
+#list of keys
+lib/words.js
