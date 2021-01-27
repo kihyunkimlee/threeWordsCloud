@@ -22,7 +22,7 @@ describe('POST /file은', () => {
             request(app)
                 .post('/file')
                 .set('Content-Type', 'multipart/form-data')
-                .attach('file', path.join(__dirname, '/test.jpg'))
+                .attach('file', path.join(__dirname, 'test.jpg'))
                 .attach('age', 43200000)
                 .expect(201)
                 .end((err, res) => {
@@ -66,7 +66,7 @@ describe('POST /file은', () => {
             request(app)
                 .post('/file')
                 .set('Content-Type', 'multipart/form-data')
-                .attach('file', path.join(__dirname, '/test.php'))
+                .attach('file', path.join(__dirname, 'test.php'))
                 .expect(415)
                 .end(done);
         });
@@ -75,7 +75,7 @@ describe('POST /file은', () => {
             request(app)
                 .post('/file')
                 .set('Content-Type', 'multipart/form-data')
-                .attach('file', path.join(__dirname, '/bigPicture.jpg'))
+                .attach('file', path.join(__dirname, 'bigPicture.jpg'))
                 .expect(400, {
                     type: 'MulterError',
                     message: 'File too large'
@@ -84,7 +84,7 @@ describe('POST /file은', () => {
     });
 });
 
-describe('GET /file은', () => {
+describe('GET /file/:year/:month/:date/:fileName 은', () => {
     const words = [
         {word: '알고리즘'},
         {word: '자료구조'},
@@ -103,7 +103,7 @@ describe('GET /file은', () => {
         request(app)
             .post('/file')
             .set('Content-Type', 'multipart/form-data')
-            .attach('file', path.join(__dirname, '/', originalFileName))
+            .attach('file', path.join(__dirname, originalFileName))
             .end((err, res) => {
                 threeWordsKey.word1 = res.body.word1;
                 threeWordsKey.word2 = res.body.word2;
