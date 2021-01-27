@@ -1,5 +1,6 @@
 const { sequelize, models, Op } = require('../../models/');
 const fs = require('fs');
+const path = require('path');
 
 const createthreeWordsKey = async () => {
     const { count, rows } = await models.Word.findAndCountAll({
@@ -39,7 +40,7 @@ const createthreeWordsKey = async () => {
     return [-1, -1, -1];
 };
 
-const postFile = async (req, res, next) => {
+const createFile = async (req, res, next) => {
     const listOfMaxAges = [
         30000,    //30 seconds for test
         10800000, //3 hours
@@ -98,7 +99,7 @@ const getFile = (req, res, next) => {
 
     const { year, month, date, fileName } = req.params;
 
-    const fileUploadedPath = 'file/' + year + '/' + month + '/' + date + '/' + fileName;
+    const fileUploadedPath = path.join('file', year, month, date, fileName);
 
     models.File.findOne({
         where: {
@@ -125,6 +126,6 @@ const getFile = (req, res, next) => {
 };
 
 module.exports = {
-    postFile,
+    createFile,
     getFile,
 };
