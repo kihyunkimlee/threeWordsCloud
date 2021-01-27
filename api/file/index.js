@@ -35,8 +35,9 @@ const upload = multer({
     limits: { fileSize: 3*1024*1024 },
 });
 
-router.post('', upload.single('file'), ctrl.postFile);
+router.post('', upload.single('file'), ctrl.createFile);
 router.get('/:year/:month/:date/:fileName', ctrl.getFile);
+router.put('/:year/:month/:date/:fileName', ctrl.updateFile);
 
 router.use(handleDBError);
 router.use(handleMulterError);

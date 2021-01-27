@@ -41,20 +41,6 @@ const createthreeWordsKey = async () => {
 };
 
 const createFile = async (req, res, next) => {
-    const listOfMaxAges = [
-        30000,    //30 seconds for test
-        10800000, //3 hours
-        43200000, //12 hours
-        86400000, //24 hours
-    ];
-
-    let age = parseInt(req.body.age, 10);
-    if (Number.isNaN(age)){
-        age = 10800000;
-    } else if (listOfMaxAges.every((maxAge) => (age !== maxAge))){
-        return res.status(400).end();
-    }
-
     if (!req.file){
         if (req.fileFormatError){
             return res.status(415).end();
@@ -75,6 +61,8 @@ const createFile = async (req, res, next) => {
 
     const now = Date.now();
 
+    const defaultAge = 10800000;
+
     models.File.create({
         word1: threeWordsKey[0],
         word2: threeWordsKey[1],
@@ -84,7 +72,7 @@ const createFile = async (req, res, next) => {
         fileMimeType: mimetype,
         fileUploadedPath: path,
         createdAt: now,
-        expiredAt: now + age,
+        expiredAt: now + defaultAge, //expired after three hours
     }).then((file) => {
         return res.status(201).json(file);
     }).catch(next);
@@ -125,7 +113,56 @@ const getFile = (req, res, next) => {
 
 };
 
+const updateFile = (req, res, next) => {
+    const { word1, word2, word3 } = req.body;
+    if (!word1 || !word2 || !word3){
+        return res.status(400).end();
+    }
+
+    const listOfMaxAges = [
+        30000,    //30 seconds for test
+        10800000, //3 hours
+        43200000, //12 hours
+        86400000, //24 hours
+    ];
+
+    const age = parseInt(req.body.age, 10);
+    if (Number.isNaN(age)) return res.status(400).end();
+    if (listOfMaxAges.every((maxAge) => (age !== maxAge))){
+        return res.status(400).end();
+    }
+
+    const { year, month, date, fileName } = req.params;
+
+    const fileUploadedPath = path.join('file', year, month, date, fileName);
+
+    models.File.findOne({
+        where: {
+            [Op.and] : [
+                {word1: word1},
+                {word2: word2},
+                {word3: word3},
+            ]
+        }
+    }).then((file) => {
+        if (!file) return res.status(404).end();
+
+        if (file.fileUploadedPath !== fileUploadedPath){
+            return res.status(403).end();
+        }
+
+        if (file.expiredAt - Date.now() <= 0) return res.status(410).end();
+
+        file.expiredAt = new Date(file.createdAt.getTime() + age);
+        file.save()
+            .then(() => {
+                res.json(file);
+            }).catch(next);
+    }).catch(next);
+};
+
 module.exports = {
     createFile,
     getFile,
+    updateFile,
 };
