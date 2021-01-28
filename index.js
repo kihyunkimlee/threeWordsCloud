@@ -5,6 +5,7 @@ const morgan = require('morgan');
 const dotenv = require('dotenv');
 const session = require('express-session');
 const MySqlStore = require('express-mysql-session')(session);
+const cors = require('cors');
 const file = require('./api/file/');
 const downloadToken = require('./api/downloadToken');
 
@@ -38,6 +39,7 @@ app.use(session({
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors());
 
 app.use('/file', file);
 app.use('/downloadToken', downloadToken);
