@@ -39,7 +39,10 @@ app.use(session({
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cors({
+    origin: true,
+    credentials: true,
+}));
 
 app.use('/file', file);
 app.use('/downloadToken', downloadToken);
