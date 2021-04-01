@@ -116,7 +116,7 @@ const getFile = (req, res, next) => {
             return res.status(403).end();
         }
 
-        res.setHeader('Content-disposition', 'filename=' + file.originalFileName);
+        res.attachment(file.originalFileName.normalize());
         res.setHeader('Content-type', file.fileMimeType);
 
         const filestream = fs.createReadStream(file.fileUploadedPath);
