@@ -22,19 +22,19 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: true,
         },
         originalFileName: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        fileSize: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },
-        fileMimeType: {
             //On Windows, Linux, Solaris, and Mac os X, the maximum number of characters for a file name is 255Bytes.
             type: DataTypes.STRING,
             allowNull: false,
         },
-        fileUploadedPath: {
+        size: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        mimeType: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        uploadedPath: {
             //the maximum combined length of both file name and path name is vary with OS.
             type: DataTypes.TEXT,
             allowNull: false,

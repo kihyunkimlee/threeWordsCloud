@@ -31,9 +31,9 @@ describe('POST /file은', () => {
                         'word2',
                         'word3',
                         'originalFileName',
-                        'fileSize',
-                        'fileMimeType',
-                        'fileUploadedPath',
+                        'size',
+                        'mimeType',
+                        'uploadedPath',
                         'createdAt',
                         'expiredAt',
                     ]);
@@ -113,7 +113,7 @@ describe('GET /file/:year/:month/:date/:fileName 은', () => {
             });
     });
 
-    let fileUploadedPath;
+    let uploadedPath;
     let cookie;
 
     before((done) => {
@@ -122,7 +122,7 @@ describe('GET /file/:year/:month/:date/:fileName 은', () => {
             .send(threeWordsKey)
             .end((err, res) => {
                 cookie = res.header['set-cookie'][0].split(';')[0];
-                fileUploadedPath = res.body.fileUploadedPath;
+                uploadedPath = res.body.uploadedPath;
 
                 done();
             });
@@ -131,7 +131,7 @@ describe('GET /file/:year/:month/:date/:fileName 은', () => {
     describe('성공시', () => {
         it('원래 파일 이름이 ' + originalFileName + ' 인 파일을 반환한다.', (done) => {
             request(app)
-                .get('/' + fileUploadedPath)
+                .get('/' + uploadedPath)
                 .set('cookie', cookie)
                 .end((err, res) => {
                     res.header.should.have.properties({
@@ -145,7 +145,7 @@ describe('GET /file/:year/:month/:date/:fileName 은', () => {
     describe('실패시', () => {
         it('요청 헤더에 세션키가 설정되어 있지 않은 경우 401을 응답한다.', (done) =>{
             request(app)
-                .get('/' + fileUploadedPath)
+                .get('/' + uploadedPath)
                 .expect(401)
                 .end(done);
         });

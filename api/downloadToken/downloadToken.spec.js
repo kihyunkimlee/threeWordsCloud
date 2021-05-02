@@ -45,9 +45,9 @@ describe('POST /downloadToken은 ', () => {
                         'word2',
                         'word3',
                         'originalFileName',
-                        'fileSize',
-                        'fileMimeType',
-                        'fileUploadedPath',
+                        'size',
+                        'mimeType',
+                        'uploadedPath',
                         'createdAt'
                     ]);
 

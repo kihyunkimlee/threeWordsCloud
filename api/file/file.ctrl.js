@@ -71,7 +71,7 @@ const createFile = async (req, res, next) => {
         return res.status(503).end();
     }
 
-    const { originalname, size, mimetype, path } = req.file;
+    const { originalname, size, mimetype, uploadedPath } = req.file;
 
     const now = Date.now();
 
@@ -80,9 +80,9 @@ const createFile = async (req, res, next) => {
         word2: threeWordsKey[1],
         word3: threeWordsKey[2],
         originalFileName: originalname,
-        fileSize: size,
-        fileMimeType: mimetype,
-        fileUploadedPath: path,
+        size: size,
+        mimeType: mimetype,
+        uploadedPath: uploadedPath,
         createdAt: now,
         expiredAt: now + age,
     }).then((file) => {
@@ -99,7 +99,7 @@ const getFile = (req, res, next) => {
 
     const { year, month, date, fileName } = req.params;
 
-    const fileUploadedPath = path.join('file', year, month, date, fileName);
+    const uploadedPath = path.join('file', year, month, date, fileName);
 
     models.File.findOne({
         where: {
@@ -112,14 +112,14 @@ const getFile = (req, res, next) => {
     }).then((file) => {
         if (!file) return res.status(410).end();
         
-        if (file.fileUploadedPath !== fileUploadedPath){
+        if (file.uploadedPath !== uploadedPath){
             return res.status(403).end();
         }
 
         res.attachment(file.originalFileName.normalize());
-        res.setHeader('Content-type', file.fileMimeType);
+        res.setHeader('Content-type', file.mimeType);
 
-        const filestream = fs.createReadStream(file.fileUploadedPath);
+        const filestream = fs.createReadStream(file.uploadedPath);
         filestream.pipe(res);
     }).catch(next);
 
