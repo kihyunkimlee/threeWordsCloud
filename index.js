@@ -13,17 +13,17 @@ if (process.env.NODE_ENV !== 'test'){
     app.use(morgan('dev'));
 }
 
-dotenv.config();
-
-const { DB_HOST, DB_PORT, DB_USER, DB_PW, SESSION_DB_NAME } = process.env;
+if (process.env.NODE_ENV === 'test'){
+    dotenv.config();
+}
 
 const sessionStore = new MySqlStore({
     dialect: 'mysql',
-    host: DB_HOST,
-    port: DB_PORT,
-    user: DB_USER,
-    password: DB_PW,
-    database: SESSION_DB_NAME,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PW,
+    database: process.env.SESSION_DB_NAME,
 });
 
 app.use(session({
@@ -44,7 +44,7 @@ app.use(cors({
     credentials: true,
 }));
 
-app.use('/file', file);
-app.use('/downloadToken', downloadToken);
+app.use('/api/file', file);
+app.use('/api/downloadToken', downloadToken);
 
 module.exports = app;

@@ -1,5 +1,5 @@
 const { models } = require('../models');
-const words = require('../lib/words');
+const words = require('../words');
 
 module.exports = () => {
     console.log('initializing database...');

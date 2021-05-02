@@ -7,7 +7,7 @@ syncDB()
     .then(initDB)
     .then(tic)
     .then(() => {
-        app.listen(3000, () => {
-            console.log('server is running on ' + 3000 + ' port!');
+        app.listen(5000, () => {
+            console.log('server is running on ' + 5000 + ' port!');
         });
     });
