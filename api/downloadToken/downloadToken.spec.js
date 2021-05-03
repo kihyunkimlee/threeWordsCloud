@@ -4,7 +4,7 @@ const app = require('../../');
 const path = require('path');
 const { sequelize, models } = require('../../models/');
 
-describe('POST /downloadToken은 ', () => {
+describe('POST /api/downloadToken은 ', () => {
     const words = [
         {word: '알고리즘'},
         {word: '자료구조'},
@@ -21,7 +21,7 @@ describe('POST /downloadToken은 ', () => {
 
     before((done) => {
         request(app)
-            .post('/file')
+            .post('/api/file')
             .set('Content-Type', 'multipart/form-data')
             .attach('file', path.join(__dirname, '/', originalFileName))
             .end((err, res) => {
@@ -36,7 +36,7 @@ describe('POST /downloadToken은 ', () => {
     describe('성공시', () => {
         it('원래 파일 이름이 ' + originalFileName + ' 인 파일 객체를 반환한다. ', (done) => {
             request(app)
-                .post('/downloadToken')
+                .post('/api/downloadToken')
                 .send(threeWordsKey)
                 .end((err, res) => {
                     res.body.should.have.property('originalFileName', originalFileName);
@@ -47,7 +47,8 @@ describe('POST /downloadToken은 ', () => {
                         'originalFileName',
                         'size',
                         'mimeType',
-                        'uploadedPath',
+                        'key',
+                        'location',
                         'createdAt'
                     ]);
 
@@ -57,7 +58,7 @@ describe('POST /downloadToken은 ', () => {
 
         it('세션 키를 발급한다.', (done) => {
             request(app)
-                .post('/downloadToken')
+                .post('/api/downloadToken')
                 .send(threeWordsKey)
                 .end((err, res) => {
                     res.header.should.have.property('set-cookie');
@@ -70,14 +71,14 @@ describe('POST /downloadToken은 ', () => {
     describe('실패시', () => {
         it('세글자 키를 전송하지 않은 경우 400을 응답한다.', (done) => {
             request(app)
-                .post('/downloadToken')
+                .post('/api/downloadToken')
                 .expect(400)
                 .end(done);
         });
 
         it('세글자 키 중에서 일부라도 전송하지 않은 경우 400을 응답한다.', (done) => {
             request(app)
-                .post('/downloadToken')
+                .post('/api/downloadToken')
                 .send({
                     word1: 'NO',
                     word2: 'word3'
@@ -87,7 +88,7 @@ describe('POST /downloadToken은 ', () => {
 
         it('세글자 키가 유효하지 않은 경우 404를 응답한다.', (done) => {
             request(app)
-                .post('/downloadToken')
+                .post('/api/downloadToken')
                 .send({
                     word1: 'NOT',
                     word2: 'AVAILABLE',
