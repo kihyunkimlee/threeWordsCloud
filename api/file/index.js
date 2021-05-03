@@ -2,17 +2,22 @@ const express = require('express');
 const router = express.Router();
 const ctrl = require('./file.ctrl');
 const multer = require('multer');
-const { createPath, makeDir } = require('../../lib');
+const multerS3 = require('multer-s3');
+const s3 = require('../../s3');
+const dotenv = require('dotenv');
+const { getRandomKey } = require('../../utils');
 const { handleMulterError, handleDBError } = require('../../middleware/errorHandler');
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const newPath = createPath('file');
+if (process.env.NODE_ENV === 'test'){
+    dotenv.config();
+}
 
-        makeDir(newPath);
-
-        cb(null, newPath);
-    }
+const storage = multerS3({
+    s3: s3,
+    bucket: process.env.AWS_S3_BUCKET_NAME,
+    acl: 'private',
+    key: getRandomKey,
+    contentDisposition: 'attachment',
 });
 
 const fileFilter = (req, file, cb) => {

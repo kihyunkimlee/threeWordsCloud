@@ -1,13 +1,15 @@
-const fs = require('fs');
+const crypto = require('crypto');
 
-module.exports.createPath = (basePath) => {
+module.exports.getRandomKey = (req, file, cb) => {
     const d = new Date();
 
-    return basePath + '/' +  d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate();
-};
-
-module.exports.makeDir = (path) => {
-    if (!fs.existsSync(path)){    
-        fs.mkdirSync(path, { recursive: true });
-    }
+    crypto.randomBytes(32, (err, buf) => {
+        if (err){
+            cb(err, undefined);
+        } else{
+            const key = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + '/' + buf.toString('hex');
+            
+            cb(null, key);
+        }
+    });
 };

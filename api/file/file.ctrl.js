@@ -1,6 +1,11 @@
 const { sequelize, models, Op } = require('../../models/');
-const fs = require('fs');
 const path = require('path');
+const s3 = require('../../s3');
+const dotenv = require('dotenv');
+
+if (process.env.NODE_ENV === 'test'){
+    dotenv.config();
+}
 
 const createthreeWordsKey = async () => {
     const { count, rows } = await models.Word.findAndCountAll({
@@ -71,7 +76,7 @@ const createFile = async (req, res, next) => {
         return res.status(503).end();
     }
 
-    const { originalname, size, mimetype, uploadedPath } = req.file;
+    const { originalname, size, mimetype, key, location } = req.file;
 
     const now = Date.now();
 
@@ -82,7 +87,8 @@ const createFile = async (req, res, next) => {
         originalFileName: originalname,
         size: size,
         mimeType: mimetype,
-        uploadedPath: uploadedPath,
+        key: key,
+        location: location,
         createdAt: now,
         expiredAt: now + age,
     }).then((file) => {
@@ -99,7 +105,7 @@ const getFile = (req, res, next) => {
 
     const { year, month, date, fileName } = req.params;
 
-    const uploadedPath = path.join('file', year, month, date, fileName);
+    const key = path.join(year, month, date, fileName);
 
     models.File.findOne({
         where: {
@@ -112,14 +118,20 @@ const getFile = (req, res, next) => {
     }).then((file) => {
         if (!file) return res.status(410).end();
         
-        if (file.uploadedPath !== uploadedPath){
+        if (file.key !== key){
             return res.status(403).end();
         }
 
-        res.attachment(file.originalFileName.normalize());
+        res.attachment(file.originalFileName);
         res.setHeader('Content-type', file.mimeType);
 
-        const filestream = fs.createReadStream(file.uploadedPath);
+        const params = {
+            Bucket: process.env.AWS_S3_BUCKET_NAME,
+            Key: file.key,
+        };
+
+        const filestream = s3.getObject(params).createReadStream();
+
         filestream.pipe(res);
     }).catch(next);
 
