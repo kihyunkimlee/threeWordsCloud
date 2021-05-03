@@ -34,9 +34,12 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        uploadedPath: {
-            //the maximum combined length of both file name and path name is vary with OS.
-            type: DataTypes.TEXT,
+        key: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        location: {
+            type: DataTypes.STRING,
             allowNull: false,
         },
         createdAt: {
