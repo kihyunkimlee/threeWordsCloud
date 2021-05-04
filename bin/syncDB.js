@@ -1,11 +1,11 @@
 const { sequelize } = require('../models');
 
 module.exports = () => {
+    console.log('synchronzing database...');
+
     const options = {
         force: true,
     };
-
-    console.log('synchronzing database...');
 
     return sequelize.sync(options);
 };
