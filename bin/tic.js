@@ -1,50 +1,75 @@
 const cron = require('node-cron');
-const fs = require('fs');
-const path = require('path');
+const s3 = require('../s3');
+const dotenv = require('dotenv');
 const { models, Op } = require('../models');
+
+if (process.env.NODE_ENV === 'test'){
+    dotenv.config();
+}
+
+const deleteObjects = (Objects) => {
+    const params = {
+        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Delete: { Objects },
+    };
+
+    return new Promise((resolve, reject) => {
+        s3.deleteObjects(params, (err, data) => {
+            if (err){
+                console.log('fail to delete objects!');
+                reject(err);
+            } else{
+                console.log('expired objects deleted successfully!');
+                resolve();
+            }
+        });
+    });
+};
 
 module.exports = () => {
     console.log('tic... tok...');
 
-    cron.schedule('0 0 3 * * *', () => {
+    cron.schedule('0 0 3 * * *', async function (){
         console.log('start removing expired files...');
 
-        models.File.findAll({
+        const files = await models.File.findAll({
             attributes: [
                 'id',
-                'fileUploadedPath',
+                'key',
                 'expiredAt',
-            ],
-        }).then((files) => {
-            if (!files) return;
+            ]
+        });
 
-            const now = Date.now();
+        if (!files){
+            console.log('there\'s no uploaded file');
+            return;
+        }
 
-            const expiredFiles = files.map((file) => {
-                if (file.expiredAt - now <= 0){
-                    fs.unlink(file.fileUploadedPath, (err) => {
-                        if (err) console.log(err.message);
-                        else {
-                            console.log('removed ' + file.fileUploadedPath + ' successfully!');
-                        }
-                    });
+        const now = Date.now();
 
-                    return file.id;
-                };
-            });
+        const ids = [];
+        const Objects = [];
 
-            if (expiredFiles.length === 0) return;
+        files.forEach((file) => {
+            if (file.expiredAt - now < 0){
+                ids.push(file.id);
+                Objects.push({ Key: file.key });
+            }
+        });
 
-            models.File.destroy({
-                where: {
-                    id: {
-                        [Op.in]: expiredFiles,
-                    }
+        if (ids.length === 0){
+            console.log('there\'s no expired file');
+            return;
+        }
+
+        deleteObjects(Objects)
+        .then(models.File.destroy({
+            where: {
+                id: {
+                    [Op.in]: ids,
                 }
-            }).catch((err) => {
-                console.log(err.message);
-            });
-        }).catch((err) => {
+            }
+        })).catch((err) => {
             console.log(err.message);
         });
     });
